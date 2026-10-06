@@ -918,12 +918,18 @@ body.classic #sheet .appbar::before{display:none}
         <input type="color" id="br-custom" value="#2F80FF" onchange="setBrand(this.value)" style="width:46px;height:36px;border:1px solid var(--border2);border-radius:10px;background:none;padding:2px;cursor:pointer">
         <span class="num" id="br-hex" style="font-size:13px;color:var(--text2)">#2F80FF</span>
       </div></div>
-    <div class="card"><div style="font-size:14px;font-weight:700">Logo mark</div>
-      <div class="emrow" id="emrow"></div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
-        <div id="br-logo" style="width:52px;height:52px;border-radius:14px;background:rgba(47,128,255,.14);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--blue);flex:none">D</div>
-        <div style="font-size:12.5px;color:var(--text2);line-height:1.5">Pick an emoji mark, or tap <b>“A”</b> to use your broker initial instead.</div>
-      </div></div>
+    <div class="card"><div style="font-size:14px;font-weight:700;margin-bottom:8px">Brand assets</div>
+      <div class="f2" style="margin:0 0 10px">
+        <div class="field" style="margin:0"><label>Primary logo · PNG/JPG/SVG</label><input type="file" id="br-logo-file" accept="image/png,image/jpeg,image/svg+xml" onchange="brandFile(this,'logo')"></div>
+        <div class="field" style="margin:0"><label>Compact app icon · PNG/JPG/SVG</label><input type="file" id="br-icon-file" accept="image/png,image/jpeg,image/svg+xml" onchange="brandFile(this,'icon')"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div id="br-logo" style="width:96px;height:52px;border-radius:6px;background:rgba(47,128,255,.10);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--blue);overflow:hidden;flex:none">D</div>
+        <div id="br-icon" style="width:52px;height:52px;border-radius:10px;background:rgba(47,128,255,.10);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--blue);overflow:hidden;flex:none">D</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Use original broker artwork. If no file is uploaded, OrbitTrader uses the broker initial. Demo previews are stored locally; production branding belongs on the broker server.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn ghost sm" style="margin:0" onclick="clearBrandAsset('logo')">Clear logo</button><button class="btn ghost sm" style="margin:0" onclick="clearBrandAsset('icon')">Clear icon</button></div>
+    </div>
     <div class="card">
       <div style="font-size:14px;font-weight:700;margin-bottom:6px">App name & tagline</div>
       <div class="field" style="margin:0 0 10px"><label>Tagline</label><input id="br-tag" maxlength="60" placeholder="Trade the world" oninput="brandExtra()"></div>
@@ -948,10 +954,10 @@ body.classic #sheet .appbar::before{display:none}
     </div>
     <div class="sec">Branded client build</div>
     <div class="card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Build APK</div>
-      <div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:6px">Simulated pipeline — produces a downloadable build summary. <b>Demo build, not a real APK.</b></div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Client build preview</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:6px">Configuration preview only — produces a downloadable build summary. <b>This does not compile or sign an APK.</b></div>
       <div id="apksteps"></div>
-      <div style="padding:10px 0 2px"><button class="btn sm" id="apkbtn" style="width:100%" onclick="genApk()">Start build</button></div>
+      <div style="padding:10px 0 2px"><button class="btn sm" id="apkbtn" style="width:100%" onclick="genApk()">Generate preview</button></div>
       <div class="prog" id="apkwrap" style="display:none;margin:12px 0 0"><i id="apkbar"></i></div>
       <div id="apkmsg" style="font-size:13px;color:var(--text2);margin-top:10px;line-height:1.6"></div>
     </div>
@@ -1441,8 +1447,8 @@ if(!Array.isArray(MANAGERS)||!MANAGERS.length){
 }
 MANAGERS.forEach(m=>{m.role=roleOf(m);});
 let BRAND=load(LS_B,null);
-if(!BRAND||typeof BRAND!=="object"){BRAND={name:"Demo Broker Ltd",color:"#2F80FF",logoMode:"initial",logoEmoji:"🪐"};save(LS_B,BRAND);}
-["tagline","splashText","supportEmail","supportWhats"].forEach(k=>{if(BRAND[k]==null)BRAND[k]="";});
+if(!BRAND||typeof BRAND!=="object"){BRAND={name:"Demo Broker Ltd",color:"#2F80FF",logoMode:"initial",logoEmoji:"",logoData:"",iconData:""};save(LS_B,BRAND);}
+["tagline","splashText","supportEmail","supportWhats","logoData","iconData"].forEach(k=>{if(BRAND[k]==null)BRAND[k]="";});
 if(BRAND.splashOn===undefined)BRAND.splashOn=true;
 if(!BRAND.splashText)BRAND.splashText="Welcome";
 save(LS_B,BRAND);
@@ -1846,12 +1852,10 @@ function delManager(id){
 
 /* ============ BRANDING tab ============ */
 const COLORS=["#2F80FF","#2EBD85","#D4AF37","#F23645","#8B5CF6","#111111"];
-const EMOJIS=["🪐","🚀","💎","🌐","⚡","🔷","A"];
 function renderBrand(){
   $("br-name").value=BRAND.name;
   $("swrow").innerHTML=COLORS.map(c=>'<div class="swch'+(c.toUpperCase()===BRAND.color.toUpperCase()?" on":"")+'" style="background:'+c+'" onclick="setBrand(\''+c+'\')"></div>').join("");
   $("br-custom").value=BRAND.color;$("br-hex").textContent=BRAND.color.toUpperCase();
-  $("emrow").innerHTML=EMOJIS.map(e=>'<div class="em'+(logoKey()===e?" on":"")+'" onclick="setLogo(\''+e+'\')">'+e+'</div>').join("");
   $("br-tag").value=BRAND.tagline||"";
   $("br-splashtext").value=BRAND.splashText||"";
   $("br-email").value=BRAND.supportEmail||"";
@@ -1859,27 +1863,44 @@ function renderBrand(){
   $("br-splash").classList.toggle("on",!!BRAND.splashOn);
   paintBrand();
 }
-function logoKey(){return BRAND.logoMode==="emoji"?BRAND.logoEmoji:"A";}
 /* shared white-label key — launcher + trader/manager read this */
-function saveSharedBrand(){try{localStorage.setItem("orbit-brand",JSON.stringify({name:BRAND.name,color:BRAND.color,logoMode:BRAND.logoMode,logoEmoji:BRAND.logoEmoji,tagline:BRAND.tagline,splashOn:BRAND.splashOn,splashText:BRAND.splashText,supportEmail:BRAND.supportEmail,supportWhats:BRAND.supportWhats}));}catch(e){}}
+function saveSharedBrand(){try{localStorage.setItem("orbit-brand",JSON.stringify({name:BRAND.name,color:BRAND.color,logoMode:"asset",logoData:BRAND.logoData||"",iconData:BRAND.iconData||"",tagline:BRAND.tagline,splashOn:BRAND.splashOn,splashText:BRAND.splashText,supportEmail:BRAND.supportEmail,supportWhats:BRAND.supportWhats}));}catch(e){}}
 function setBrand(c){BRAND.color=c;save(LS_B,BRAND);saveSharedBrand();renderBrand();audit("admin","brand.color",c.toUpperCase());toast("Brand color",c.toUpperCase());}
-function setLogo(e){if(e==="A"){BRAND.logoMode="initial";}else{BRAND.logoMode="emoji";BRAND.logoEmoji=e;}save(LS_B,BRAND);saveSharedBrand();renderBrand();audit("admin","brand.logo",e);}
 function brandChanged(){BRAND.name=$("br-name").value||"Broker";save(LS_B,BRAND);saveSharedBrand();paintBrand();}
-function logoHTML(size){
-  if(BRAND.logoMode==="emoji")return '<span style="font-size:'+Math.round(size*0.55)+'px">'+BRAND.logoEmoji+'</span>';
+function brandFile(input,kind){
+  const file=input&&input.files&&input.files[0];if(!file)return;
+  if(!/^image\/(png|jpeg|svg\+xml)$/i.test(file.type)){toast("Unsupported image","Use PNG, JPG or SVG");input.value="";return;}
+  if(file.size>450000){toast("Image too large","Keep branding images under 450 KB");input.value="";return;}
+  const rd=new FileReader();
+  rd.onload=function(){
+    if(kind==="icon")BRAND.iconData=String(rd.result||"");else BRAND.logoData=String(rd.result||"");
+    BRAND.logoMode="asset";save(LS_B,BRAND);saveSharedBrand();paintBrand();
+    audit("admin","brand.asset",kind+" uploaded");toast("Brand asset saved",kind==="icon"?"App icon":"Primary logo");
+  };
+  rd.readAsDataURL(file);
+}
+function clearBrandAsset(kind){
+  if(kind==="icon")BRAND.iconData="";else BRAND.logoData="";
+  save(LS_B,BRAND);saveSharedBrand();paintBrand();audit("admin","brand.asset",kind+" cleared");
+}
+
+function logoHTML(size,compact){
+  const src=(compact&&BRAND.iconData)||BRAND.logoData||BRAND.iconData;
+  if(src)return '<img alt="" src="'+String(src).replace(/"/g,"&quot;")+'" style="display:block;max-width:100%;max-height:100%;object-fit:contain">';
   return '<span style="font-size:'+Math.round(size*0.5)+'px;font-weight:800">'+esc((BRAND.name||"B")[0].toUpperCase())+'</span>';
 }
 function paintBrand(){
   document.documentElement.style.setProperty("--brand",BRAND.color);
   document.documentElement.style.setProperty("--pc",BRAND.color);
   const nm=BRAND.name||"Broker";
-  $("br-logo").style.background=BRAND.color+"22";$("br-logo").style.color=BRAND.color;
-  $("br-logo").innerHTML=logoHTML(52);
+  $("br-logo").style.background=BRAND.color+"16";$("br-logo").style.color=BRAND.color;
+  $("br-logo").innerHTML=logoHTML(52,false);
+  if($("br-icon")){$("br-icon").style.background=BRAND.color+"16";$("br-icon").style.color=BRAND.color;$("br-icon").innerHTML=logoHTML(52,true);}
   $("head-sub").textContent="Platform online · "+nm;
   // live phone preview
   $("pv-head").style.background=BRAND.color;
   $("pv-logo").style.background="rgba(255,255,255,.25)";
-  $("pv-logo").innerHTML=logoHTML(30);
+  $("pv-logo").innerHTML=logoHTML(30,true);
   $("pv-name").textContent=nm;
   renderPvRows();
 }
@@ -1892,16 +1913,16 @@ function renderPvRows(){
   }).join("");
 }
 /* simulated APK build */
-const APK_STEPS=["Preparing workspace","Applying branding","Compiling resources","Signing package","Verifying bundle"];
+const APK_STEPS=["Collecting configuration","Applying branding preview","Validating symbol/group settings","Generating manifest","Creating preview summary"];
 function renderApkSteps(done){
   $("apksteps").innerHTML=APK_STEPS.map((s,i)=>'<div class="steplog'+(i<done?" done":"")+'"><span class="st">'+(i<done?"✓":"")+'</span>'+s+'</div>').join("");
 }
 let apkRunning=false;
 function genApk(){
   if(apkRunning)return;apkRunning=true;
-  const b=$("apkbtn");b.textContent="Building…";b.style.opacity=".6";
+  const b=$("apkbtn");b.textContent="Generating…";b.style.opacity=".6";
   $("apkwrap").style.display="block";$("apkbar").style.width="0";$("apkmsg").innerHTML="";
-  renderApkSteps(0);logEvent("APK build started ("+BRAND.name+")","warn");
+  renderApkSteps(0);logEvent("Client build preview started ("+BRAND.name+")","warn");
   let step=0;
   const iv=setInterval(()=>{
     step++;
@@ -1909,7 +1930,7 @@ function genApk(){
     $("apkbar").style.width=Math.round(step/APK_STEPS.length*100)+"%";
     if(step>=APK_STEPS.length){
       clearInterval(iv);apkRunning=false;
-      b.textContent="Start build";b.style.opacity="1";
+      b.textContent="Generate preview";b.style.opacity="1";
       const fname="OrbitTrader-"+BRAND.name.replace(/[^A-Za-z0-9]/g,"")+"-build.json";
       const info={package:"com.orbittrader.client",build:"demo",broker:BRAND.name,primaryColor:BRAND.color,
         logoMode:BRAND.logoMode,logoEmoji:BRAND.logoEmoji,builtAt:new Date().toISOString(),
@@ -1921,8 +1942,8 @@ function genApk(){
       $("apkmsg").innerHTML='<b style="color:var(--green)">Build complete</b> · demo summary ready<br>'+
         '<a href="'+url+'" download="'+fname+'" style="color:var(--blue);font-weight:700">Download build-info.json</a> '+
         '<span style="color:var(--text3)">(demo — not a real APK)</span>';
-      logEvent("APK build finished — demo summary ready","ok");
-      toast("Build complete","Demo summary ready to download");
+      logEvent("Client build preview finished — summary ready","ok");
+      toast("Preview complete","Configuration summary ready");
     }
   },700);
 }
