@@ -2606,7 +2606,7 @@ function saveDorm(){
 function renderKYC(){
   $("kyc-list").innerHTML=KYC.map(k=>
     '<div class="card" style="margin:0 0 8px"><div style="display:flex;align-items:center;gap:10px">'+
-    '<b style="font-size:14.5px;flex:1">'+(k.country==="*"?"🌐 All countries":esc(k.country))+'</b>'+
+    '<b style="font-size:14.5px;flex:1">'+(k.country==="*"?"All countries":esc(k.country))+'</b>'+
     '<button class="btn ghost sm" style="margin:0" onclick="kycForm(\''+k.id+'\')">Edit</button>'+
     '<button class="btn ghost sm" style="margin:0;color:var(--red)" onclick="delKYC(\''+k.id+'\')">✕</button></div>'+
     '<div style="font-size:12.5px;color:var(--text2);margin-top:6px">'+esc(k.docs)+'</div></div>').join("");
@@ -3143,8 +3143,8 @@ function emgIncidentDraft(){
 function applyIncidentBar(){
   const b=$("incident-bar");if(!b)return;
   const bits=[];
-  if(EMG.killNew)bits.push("🚫 NEW DEMO ORDERS DISABLED");
-  if(EMG.incident)bits.push("🚨 "+(EMG.incidentMsg||"Incident mode"));
+  if(EMG.killNew)bits.push("NEW DEMO ORDERS DISABLED");
+  if(EMG.incident)bits.push("INCIDENT · "+(EMG.incidentMsg||"Incident mode"));
   if(bits.length){b.style.display="block";b.textContent=bits.join("  ·  ");}
   else b.style.display="none";
 }
