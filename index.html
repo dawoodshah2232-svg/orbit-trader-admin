@@ -1912,7 +1912,7 @@ function renderPvRows(){
     return '<div class="pvrow"><div class="ps">'+esc(disp(s))+'</div><div style="text-align:right"><div class="pp num">'+p+'</div><div class="pd num">'+st+'</div></div></div>';
   }).join("");
 }
-/* simulated APK build */
+/* client build configuration preview — does not compile/sign an APK */
 const APK_STEPS=["Collecting configuration","Applying branding preview","Validating symbol/group settings","Generating manifest","Creating preview summary"];
 function renderApkSteps(done){
   $("apksteps").innerHTML=APK_STEPS.map((s,i)=>'<div class="steplog'+(i<done?" done":"")+'"><span class="st">'+(i<done?"✓":"")+'</span>'+s+'</div>').join("");
@@ -1933,15 +1933,15 @@ function genApk(){
       b.textContent="Generate preview";b.style.opacity="1";
       const fname="OrbitTrader-"+BRAND.name.replace(/[^A-Za-z0-9]/g,"")+"-build.json";
       const info={package:"com.orbittrader.client",build:"demo",broker:BRAND.name,primaryColor:BRAND.color,
-        logoMode:BRAND.logoMode,logoEmoji:BRAND.logoEmoji,builtAt:new Date().toISOString(),
+        logoMode:BRAND.logoMode,hasPrimaryLogo:!!BRAND.logoData,hasAppIcon:!!BRAND.iconData,builtAt:new Date().toISOString(),
         symbols:SYMS.map(y=>({symbol:y.sym,spreadPts:y.spread,digits:y.digits,enabled:y.enabled,custom:!!y.custom})),
         groups:GROUPS.map(g=>({name:g.name,leverage:g.leverage,stopOut:g.stopOut})),
-        note:"DEMO BUILD SUMMARY — configuration snapshot, not a real APK."};
+        note:"CONFIGURATION PREVIEW — this file is not an APK and does not represent a signed build."};
       const blob=new Blob([JSON.stringify(info,null,2)],{type:"application/json"});
       const url=URL.createObjectURL(blob);
-      $("apkmsg").innerHTML='<b style="color:var(--green)">Build complete</b> · demo summary ready<br>'+
+      $("apkmsg").innerHTML='<b style="color:var(--green)">Preview complete</b> · configuration summary ready<br>'+
         '<a href="'+url+'" download="'+fname+'" style="color:var(--blue);font-weight:700">Download build-info.json</a> '+
-        '<span style="color:var(--text3)">(demo — not a real APK)</span>';
+        '<span style="color:var(--text3)">(configuration only — not an APK)</span>';
       logEvent("Client build preview finished — summary ready","ok");
       toast("Preview complete","Configuration summary ready");
     }
