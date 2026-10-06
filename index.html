@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -605,7 +605,7 @@ body.classic #sheet .appbar::before{display:none}
 <body data-ot-app="admin">
 <div class="phone">
   <header class="rx-top">
-    <div class="rx-brand"><svg viewBox="0 0 512 512"><defs><radialGradient id="PLGA" cx="0.35" cy="0.3" r="0.95"><stop offset="0" stop-color="#9CC6FF"/><stop offset="0.45" stop-color="#3E8BFF"/><stop offset="1" stop-color="#0C46B8"/></radialGradient><linearGradient id="RGA" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6FA5FF"/><stop offset="0.55" stop-color="#2F80FF" stop-opacity=".7"/><stop offset="1" stop-color="#2F80FF" stop-opacity=".2"/></linearGradient><clipPath id="FCA"><rect x="-40" y="244" width="592" height="308" transform="rotate(-18 256 256)"/></clipPath></defs><ellipse cx="256" cy="256" rx="214" ry="72" fill="none" stroke="url(#RGA)" stroke-width="26" transform="rotate(-18 256 256)"/><circle cx="256" cy="256" r="112" fill="url(#PLGA)"/><ellipse cx="216" cy="206" rx="46" ry="30" fill="#FFFFFF" opacity="0.3" transform="rotate(-24 216 206)"/><g clip-path="url(#FCA)"><ellipse cx="256" cy="256" rx="214" ry="72" fill="none" stroke="url(#RGA)" stroke-width="26" transform="rotate(-18 256 256)"/></g></svg><b>Orbit<span>Trader 6.1</span></b></div>
+    <div class="rx-brand"><svg viewBox="0 0 512 512"><defs><radialGradient id="PLGA" cx="0.35" cy="0.3" r="0.95"><stop offset="0" stop-color="#9CC6FF"/><stop offset="0.45" stop-color="#3E8BFF"/><stop offset="1" stop-color="#0C46B8"/></radialGradient><linearGradient id="RGA" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6FA5FF"/><stop offset="0.55" stop-color="#2F80FF" stop-opacity=".7"/><stop offset="1" stop-color="#2F80FF" stop-opacity=".2"/></linearGradient><clipPath id="FCA"><rect x="-40" y="244" width="592" height="308" transform="rotate(-18 256 256)"/></clipPath></defs><ellipse cx="256" cy="256" rx="214" ry="72" fill="none" stroke="url(#RGA)" stroke-width="26" transform="rotate(-18 256 256)"/><circle cx="256" cy="256" r="112" fill="url(#PLGA)"/><ellipse cx="216" cy="206" rx="46" ry="30" fill="#FFFFFF" opacity="0.3" transform="rotate(-24 216 206)"/><g clip-path="url(#FCA)"><ellipse cx="256" cy="256" rx="214" ry="72" fill="none" stroke="url(#RGA)" stroke-width="26" transform="rotate(-18 256 256)"/></g></svg><b>Orbit<span>Trader 6.3</span></b></div>
     <span class="rx-role">ADMIN</span>
     <div class="seg" id="mode-seg" role="tablist" aria-label="Interface mode" style="padding:2px;gap:2px">
       <button id="mode-btn-classic" onclick="setMode('classic')" title="Classic — traditional broker-admin layout" style="padding:7px 10px;font-size:11.5px">Classic</button>
@@ -4374,7 +4374,7 @@ function tickClock(){const d=new Date();const t=d.getHours()+":"+String(d.getMin
   /* one failing render must not kill the rest of boot */
   function step(n,f){try{f();}catch(e){try{console.warn("[admin boot] step failed: "+n,e);}catch(_){}}}
   step("theme",()=>{const q=new URLSearchParams(location.search);
-   const th=q.get("theme")||(function(){try{return localStorage.getItem("orbit-theme-v2");}catch(e){return null;}}())||"light";
+   const th=q.get("theme")||(function(){try{return localStorage.getItem("orbit-theme-v2");}catch(e){return null;}}())||"dark";
    applyTheme(th==="light"?"light":"dark");
    const tab=parseInt(q.get("tab")||"0",10);
    if(tab>=0&&tab<=15)anav(tab,null);});
@@ -4605,7 +4605,7 @@ function renderStatusBar() {
   var t = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0");
   var srv = "local demo";
   try { var s = OrbitAPI.status(); srv = s.mode === "online" ? "broker server · online" : (s.mode === "offline" ? "broker server · offline" : "local demo"); } catch (e) {}
-  el.innerHTML = '<span><b>OrbitTrader</b> Administrator 6.0</span><span class="sep">·</span>' +
+  el.innerHTML = '<span><b>OrbitTrader</b> Administrator 6.3</span><span class="sep">·</span>' +
     '<span>Server: <b>' + esc(srv) + '</b></span><span class="sep">·</span>' +
     '<span>Mode: <b>' + (isClassic() ? "Classic" : "Advanced") + '</b></span><span class="sep">·</span>' +
     '<span>31 sections</span><span class="sep">·</span>' +
